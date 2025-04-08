@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Countdown Timer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Countdown Inputs -->
+  <div class="timer-input" id="timer-input">
+    <input type="number" id="hours" placeholder="HH" min="0" max="23">
+    <input type="number" id="minutes" placeholder="MM" min="0" max="59">
+    <input type="number" id="seconds" placeholder="SS" min="0" max="59">
+    <button onclick="startTimer()">Start</button>
+  </div>
+
+  <!-- Countdown Display -->
+  <div class="countdown">
+    <span id="hours-display">0</span><span class="time-separator">h</span>
+    <span id="minutes-display">00</span><span class="time-separator">m</span>
+    <span id="seconds-display">00</span><span class="time-separator">s</span>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Button Controls -->
+  <div class="button-group" id="button-group">
+    <button class="stop-button" id="stop-button" onclick="pauseTimer()">Stop</button>
+    <button class="resume-button" id="resume-button" onclick="resumeTimer()">Resume</button>
+    <button class="reset-button" id="reset-button" onclick="resetTimer()">Reset</button>
+  </div>
+
+  <!-- Notification Sound -->
+  <audio id="alarm-sound">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">*ENTER BUTTON TO RESTART THE TIMER*</div>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>
