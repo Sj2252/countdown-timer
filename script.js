@@ -1,157 +1,124 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
+let countdown;
+let totalSeconds;
+let initialTotalSeconds;
+let isPaused = false;
+
+function startTimer() {
+  const hours = parseInt(document.getElementById('hours').value) || 0;
+  const minutes = parseInt(document.getElementById('minutes').value) || 0;
+  const seconds = parseInt(document.getElementById('seconds').value) || 0;
+
+  totalSeconds = hours * 3600 + minutes * 60 + seconds;
+  initialTotalSeconds = totalSeconds;
+
+  if (totalSeconds <= 0) {
+    alert('Please enter a valid time');
+    return;
+  }
+
+  isPaused = false;
+
+  document.getElementById('timer-input').classList.add('hidden');
+  document.getElementById('button-group').classList.add('visible');
+  document.getElementById('resume-button').style.display = 'none';
+  document.getElementById('reset-button').style.display = 'none';
+  document.getElementById('stop-button').style.display = 'inline-block';
+
+  clearInterval(countdown);
+  updateDisplay();
+  updateProgressBar();
+
+  countdown = setInterval(() => {
+    totalSeconds--;
+    updateDisplay();
+    updateProgressBar();
+
+    if (totalSeconds <= 0) {
+      resetTimer();
+      playAlarm();
+      alert('Time is up!');
+    }
+  }, 1000);
 }
 
-body {
-  background-color: #000;
-  color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+function pauseTimer() {
+  clearInterval(countdown);
+  isPaused = true;
+
+  document.getElementById('stop-button').style.display = 'none';
+  document.getElementById('resume-button').style.display = 'inline-block';
+  document.getElementById('reset-button').style.display = 'inline-block';
 }
 
-.timer-input {
-  position: absolute;
-  bottom: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  transition: opacity 0.3s ease;
-  z-index: 2;
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  width: 90%;
-  max-width: 400px;
+function resumeTimer() {
+  if (!isPaused) return;
+
+  document.getElementById('resume-button').style.display = 'none';
+  document.getElementById('reset-button').style.display = 'none';
+  document.getElementById('stop-button').style.display = 'inline-block';
+
+  countdown = setInterval(() => {
+    totalSeconds--;
+    updateDisplay();
+    updateProgressBar();
+
+    if (totalSeconds <= 0) {
+      resetTimer();
+      playAlarm();
+      alert('Time is up!');
+    }
+  }, 1000);
 }
 
-.timer-input.hidden {
-  display: none;
+function resetTimer() {
+  clearInterval(countdown);
+  isPaused = false;
+
+  document.getElementById('timer-input').classList.remove('hidden');
+  document.getElementById('button-group').classList.remove('visible');
+
+  document.getElementById('hours-display').textContent = '0';
+  document.getElementById('minutes-display').textContent = '00';
+  document.getElementById('seconds-display').textContent = '00';
+  document.getElementById('progress-bar').style.width = '100%';
+
+  document.getElementById('hours').value = '';
+  document.getElementById('minutes').value = '';
+  document.getElementById('seconds').value = '';
 }
 
-.timer-input input {
-  background-color: transparent;
-  border: 1px solid #333;
-  padding: 12px;
-  color: white;
-  border-radius: 5px;
-  width: 80px;
-  font-size: 1.2rem;
-  text-align: center;
+function updateDisplay() {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  document.getElementById('hours-display').textContent = hours;
+  document.getElementById('minutes-display').textContent = minutes.toString().padStart(2, '0');
+  document.getElementById('seconds-display').textContent = seconds.toString().padStart(2, '0');
 }
 
-.timer-input button {
-  background-color: transparent;
-  color: #fff;
-  border: 1px solid #333;
-  padding: 12px 25px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 1rem;
-  margin-left: 10px;
+function updateProgressBar() {
+  const progress = (totalSeconds / initialTotalSeconds) * 100;
+  document.getElementById('progress-bar').style.width = `${progress}%`;
 }
 
-.timer-input button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+function playAlarm() {
+  const sound = document.getElementById('alarm-sound');
+  sound.play();
 }
 
-.button-group {
-  position: absolute;
-  bottom: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-  gap: 15px;
-  flex-wrap: wrap;
-  justify-content: center;
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      alert(`Error attempting fullscreen: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
 }
 
-.button-group.visible {
-  display: flex;
-}
-
-.stop-button,
-.resume-button,
-.reset-button,
-.fullscreen-button {
-  background-color: transparent;
-  color: #fff;
-  border: 1px solid #333;
-  padding: 12px 25px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 1rem;
-}
-
-.stop-button:hover,
-.resume-button:hover,
-.reset-button:hover,
-.fullscreen-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.countdown {
-  text-align: center;
-  font-size: 8vw;
-  font-weight: 300;
-  letter-spacing: 2px;
-  position: absolute;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-}
-
-.time-separator {
-  opacity: 0.8;
-  margin: 0 5px;
-}
-
-.progress-container {
-  width: calc(100% - 60px);
-  height: 6px;
-  background-color: #1a1a1a;
-  border-radius: 3px;
-  overflow: hidden;
-  margin: 0 30px 2rem 30px;
-  position: absolute;
-  top: 55%;
-  left: 0;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 100%;
-  background-color: #666;
-  transition: width 1s linear;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-.disclaimer {
-  position: absolute;
-  bottom: 5px;
-  left: 10px;
-  font-size: 0.7rem;
-  opacity: 0.6;
-}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    startTimer();
+  }
+});
